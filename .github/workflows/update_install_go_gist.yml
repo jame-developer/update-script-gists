@@ -1,0 +1,29 @@
+name: Update Go Version in Gist
+
+on:
+  schedule:
+    - cron:  '30 5,17 * * *'  # Runs every day at midnight
+
+jobs:
+  update-gist-if-new-go-version:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Get latest Go version
+      id: latestgo
+      run: |
+        LATEST_GO=$(curl -s https://golang.org/VERSION?m=text)
+        echo "LATEST_GO_VERSION=$LATEST_GO" >> $GITHUB_ENV
+        echo "::set-output name=version::$LATEST_GO"
+
+    - name: Update Gist if new version found
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GIST_ID: 878c273053dc6c2177b9535ef00a9855
+      run: |
+        CURRENT_VERSION=$(curl -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github.v3+json" https://api.github.com/gists/$GIST_ID | jq -r '.files["install_golang.sh"].content' | grep 'GO_VERSION=' | cut -d '"' -f 2)
+        if [ "$CURRENT_VERSION" != "$LATEST_GO_VERSION" ]; then
+          # Update the Gist with new version
+          NEW_CONTENT=$(sed "s/$CURRENT_VERSION/$LATEST_GO_VERSION/g" <<<$(curl -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github.v3+json" https://api.github.com/gists/$GIST_ID | jq -r '.files["install_go.sh"].content'))
+          curl -X PATCH -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github.v3+json" -d "{\"files\": {\"install_golang.sh\": {\"content\": \"$NEW_CONTENT\"}}}" https://api.github.com/gists/$GIST_ID
+        fi
