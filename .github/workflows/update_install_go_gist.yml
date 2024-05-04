@@ -13,9 +13,8 @@ jobs:
     - name: Get latest Go version
       id: latestgo
       run: |
-        LATEST_GO=$(curl -s https://golang.org/VERSION?m=text)
-        echo "LATEST_GO_VERSION=$LATEST_GO" >> $GITHUB_ENV
-        echo "::set-output name=version::$LATEST_GO"
+        LATEST_GO=$(curl -s -L "https://golang.org/VERSION?m=text" | sed '1p;d')
+        echo "LATEST_GO_VERSION=$LATEST_GO" >> $GITHUB_ENV  # Set as environment variable
 
     - name: Update Gist if new version found
       env:
