@@ -70,10 +70,10 @@ jobs:
         with:
           path: .
       - name: check artifacts
-        run: ls -al
+        run: ls -al latest_go_version
       - name: Get versions
         id: get_versions
-        run: echo "CURRENT_GO_VERSION=$(cat current_go_version.txt)" >> "$GITHUB_OUTPUT" && echo "LATEST_GO_VERSION=$(cat latest_go_version.txt)" >> "$GITHUB_OUTPUT"
+        run: echo "CURRENT_GO_VERSION=$(cat current_go_version/current_go_version.txt)" >> "$GITHUB_OUTPUT" && echo "LATEST_GO_VERSION=$(cat latest_go_version/latest_go_version.txt)" >> "$GITHUB_OUTPUT"
       - name: Update Gist
         run: python update_install_golang_gist.py update_gist
         if: ${{ success()}} && steps.get_versions.outputs.CURRENT_GO_VERSION != step.get_versions.outputs.LATEST_GO_VERSION && github.ref == 'refs/heads/main'

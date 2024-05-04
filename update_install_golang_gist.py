@@ -45,9 +45,9 @@ def update_gist():
         'X-GitHub-Api-Version': '2022-11-28'
     }    
         
-    with open('current_go_version.txt', 'r') as file:
+    with open('current_go_version/current_go_version.txt', 'r') as file:
         current_go_version = file.read().strip()
-    with open('latest_go_version.txt', 'r') as file:
+    with open('latest_go_version/latest_go_version.txt', 'r') as file:
         latest_go_version = file.read().strip()
     
     gist_url = f"https://api.github.com/gists/{gist_id}"
