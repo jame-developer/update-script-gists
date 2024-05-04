@@ -1,29 +1,75 @@
-name: Update Go Version in Gist
+name: Update install_golang Gist
 
+# This workflow is triggered on a schedule and can also be manually triggered from the Actions tab.
 on:
-  workflow_dispatch:    
+  # The workflow runs every 6 hours.
   schedule:
-    - cron:  '30 5,17 * * *'  # Runs every day at midnight
+    - cron: "0 */6 * * *"
+  # This allows the workflow to be run manually from the Actions tab.
+  workflow_dispatch:
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  GIST_ID: ${{ secrets.INSTALL_GOLANG_GIST_ID }}
 
 jobs:
-  update-gist-if-new-go-version:
+  check_for_new_version:
     runs-on: ubuntu-latest
-
+    outputs:
+      CURRENT_GO_VERSION: ${{ steps.current_version.outputs.CURRENT_GO_VERSION }}
+      LATEST_GO_VERSION: ${{ steps.latest_version.outputs.LATEST_GO_VERSION }}
     steps:
-    - name: Get latest Go version
-      id: latestgo
-      run: |
-        LATEST_GO=$(curl -s -L "https://golang.org/VERSION?m=text" | sed '1p;d')
-        echo "LATEST_GO_VERSION=$LATEST_GO" >> $GITHUB_ENV  # Set as environment variable
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
 
-    - name: Update Gist if new version found
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        GIST_ID: 878c273053dc6c2177b9535ef00a9855
-      run: |
-        CURRENT_VERSION=$(curl -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github.v3+json" https://api.github.com/gists/$GIST_ID | jq -r '.files["install_golang.sh"].content' | grep 'GO_VERSION=' | cut -d '"' -f 2)
-        if [ "$CURRENT_VERSION" != "$LATEST_GO_VERSION" ]; then
-          # Update the Gist with new version
-          NEW_CONTENT=$(sed "s/$CURRENT_VERSION/$LATEST_GO_VERSION/g" <<<$(curl -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github.v3+json" https://api.github.com/gists/$GIST_ID | jq -r '.files["install_go.sh"].content'))
-          curl -X PATCH -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github.v3+json" -d "{\"files\": {\"install_golang.sh\": {\"content\": \"$NEW_CONTENT\"}}}" https://api.github.com/gists/$GIST_ID
-        fi
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Get current version
+        id: current_version
+        if: ${{ success()}}
+        run: echo "CURRENT_GO_VERSION=$(python update_install_golang_gist.py get_current_version)" >> "$GITHUB_OUTPUT"
+      - name: Upload currently used GO version file
+        uses: actions/upload-artifact@v4
+        with:
+          name: current_go_version
+          path: current_go_version.txt
+
+      - name: Get latest version
+        id: latest_version
+        if: ${{ success()}}
+        run: echo "LATEST_GO_VERSION=$(python update_install_golang_gist.py get_latest_version)" >> "$GITHUB_OUTPUT"
+      - name: Upload latest GO version file
+        uses: actions/upload-artifact@v4
+        with:
+          name: latest_go_version
+          path: latest_go_version.txt
+  update_gist:
+    runs-on: ubuntu-latest
+    needs: check_for_new_version
+    if: ${{ needs.check_for_new_version.result == 'success' }} && github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+      - name: Get versions
+        id: get_versions
+        run: echo "CURRENT_GO_VERSION=$(cat current_go_version.txt)" >> "$GITHUB_OUTPUT" && echo "LATEST_GO_VERSION=$(cat latest_go_version.txt)" >> "$GITHUB_OUTPUT"
+      - name: Update Gist
+        run: python update_install_golang_gist.py update_gist
+        if: ${{ success()}} && steps.get_versions.outputs.CURRENT_GO_VERSION != step.get_versions.outputs.LATEST_GO_VERSION && github.ref == 'refs/heads/main'
+        env:
+          CURRENT_GO_VERSION: ${{ steps.get_versions.outputs.CURRENT_GO_VERSION }}
+          LATEST_GO_VERSION: ${{  steps.get_versions.outputs.LATEST_GO_VERSION }}
