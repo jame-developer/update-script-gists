@@ -6,7 +6,7 @@ import re
 
 def get_current_used_go_version():
     token = os.getenv('GITHUB_TOKEN')
-    gist_id = os.getenv('INSTALL_GOLANG_GIST_ID')
+    gist_id = os.getenv('GIST_ID')
     headers = {
         'Authorization': f'Bearer {token}',
         'Accept': 'application/vnd.github+json',
@@ -38,7 +38,7 @@ def get_latest_go_version():
 
 def update_gist():
     token = os.getenv('GITHUB_TOKEN')
-    gist_id = os.getenv('INSTALL_GOLANG_GIST_ID')
+    gist_id = os.getenv('GIST_ID')
     headers = {
         'Authorization': f'Bearer {token}',
         'Accept': 'application/vnd.github+json',
@@ -78,9 +78,7 @@ def extract_go_version(input_string):
     return None
 
 
-if __name__ == "__main__":
-    GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')
-    GIST_ID = os.getenv('INSTALL_GOLANG_GIST_ID')
+if __name__ == "__main__":    
     success = False
     if sys.argv[1] == 'get_current_version':
         success = get_current_used_go_version()
