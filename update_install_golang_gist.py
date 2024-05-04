@@ -32,14 +32,16 @@ def get_latest_go_version():
     return True
 
 
-def update_gist(current_go_version, latest_go_version):
+def update_gist():
     headers = {
         'Authorization': f'token {os.getenv('GITHUB_TOKEN')}',
         'Accept': 'application/vnd.github.v3+json'
     }    
-    
-    current_go_version = os.getenv('CURRENT_GO_VERSION')
-    latest_go_version = os.getenv('LATEST_GO_VERSION')
+        
+    with open('current_go_version.txt', 'r') as file:
+        current_go_version = file.read().strip()
+    with open('latest_go_version.txt', 'r') as file:
+        latest_go_version = file.read().strip()
     
     gist_url = f"https://api.github.com/gists/{os.getenv('INSTALL_GOLANG_GIST_ID')}"
     new_content = response.json()['files']['install_golang.sh']['content'].replace(current_go_version,

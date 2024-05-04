@@ -35,7 +35,7 @@ jobs:
       - name: Get current version
         id: current_version
         if: ${{ success()}}
-        run: echo "CURRENT_GO_VERSION=$(python update_install_golang_gist.py get_current_version)" >> "$GITHUB_OUTPUT"
+        run: python update_install_golang_gist.py get_current_version
       - name: Upload currently used GO version file
         uses: actions/upload-artifact@v4
         with:
@@ -45,7 +45,7 @@ jobs:
       - name: Get latest version
         id: latest_version
         if: ${{ success()}}
-        run: echo "LATEST_GO_VERSION=$(python update_install_golang_gist.py get_latest_version)" >> "$GITHUB_OUTPUT"
+        run: python update_install_golang_gist.py get_latest_version
       - name: Upload latest GO version file
         uses: actions/upload-artifact@v4
         with:
