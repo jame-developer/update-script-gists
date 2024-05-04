@@ -1,6 +1,7 @@
 name: Update Go Version in Gist
 
 on:
+  workflow_dispatch:    
   schedule:
     - cron:  '30 5,17 * * *'  # Runs every day at midnight
 
