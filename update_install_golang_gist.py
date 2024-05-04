@@ -8,9 +8,11 @@ def get_current_used_go_version():
     token = os.getenv('GITHUB_TOKEN')
     gist_id = os.getenv('INSTALL_GOLANG_GIST_ID')
     headers = {
-        'Authorization': f'token {token}',
-        'Accept': 'application/vnd.github.v3+json'
+        'Authorization': f'Bearer {token}',
+        'Accept': 'application/vnd.github+json',
+        'X-GitHub-Api-Version': '2022-11-28'
     }
+    print(gist_id)
     gist_url = f"https://api.github.com/gists/{gist_id}"
     response = requests.get(gist_url, headers=headers)
     if response.status_code != 200:
@@ -38,8 +40,9 @@ def update_gist():
     token = os.getenv('GITHUB_TOKEN')
     gist_id = os.getenv('INSTALL_GOLANG_GIST_ID')
     headers = {
-        'Authorization': f'token {token}',
-        'Accept': 'application/vnd.github.v3+json'
+        'Authorization': f'Bearer {token}',
+        'Accept': 'application/vnd.github+json',
+        'X-GitHub-Api-Version': '2022-11-28'
     }    
         
     with open('current_go_version.txt', 'r') as file:
