@@ -54,7 +54,7 @@ jobs:
   update_gist:
     runs-on: ubuntu-latest
     needs: check_for_new_version
-    if: ${{ needs.check_for_new_version.result == 'success' }} && github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && ${{ success()}}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -67,6 +67,10 @@ jobs:
           pip install -r requirements.txt
       - name: Download all artifacts
         uses: actions/download-artifact@v4
+        with:
+          path: .
+      - name: check artifacts
+        run: ls -al
       - name: Get versions
         id: get_versions
         run: echo "CURRENT_GO_VERSION=$(cat current_go_version.txt)" >> "$GITHUB_OUTPUT" && echo "LATEST_GO_VERSION=$(cat latest_go_version.txt)" >> "$GITHUB_OUTPUT"
