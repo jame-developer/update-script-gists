@@ -1,3 +1,8 @@
+[![CodeQL](https://github.com/jame-developer/update-script-gists/actions/workflows/codeql.yml/badge.svg)](https://github.com/jame-developer/update-script-gists/actions/workflows/codeql.yml) 
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=jame-developer_update-script-gists&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=jame-developer_update-script-gists) 
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=jame-developer_update-script-gists&metric=coverage)](https://sonarcloud.io/summary/new_code?id=jame-developer_update-script-gists)
+
+
 # Update-Script-Gists
 
 This repository serves as a hub for scripts and GitHub Actions that keep your Gists up-to-date. The scripts in this repository are designed to automatically check for updates to various software and reflect those updates in the corresponding Gists.
