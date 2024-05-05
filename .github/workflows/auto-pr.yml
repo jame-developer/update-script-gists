@@ -21,6 +21,7 @@ jobs:
           title: "New changes from branch"
           body: "This is an auto-generated PR with updates from the new branch."
           branch: ${{ github.ref }}
+          author: jame-developer-bot[bot] <dev01[bot]@vedemaj.eu>
           base: "main"
           labels: |
             report
