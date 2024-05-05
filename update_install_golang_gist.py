@@ -35,6 +35,10 @@ def get_latest_go_version():
         return False
 
     latest_go_version = response.text.split()[0]
+    # regex to check if the version is in the correct format like "go1.18.1"
+    if not re.match(r"^go\d+\.\d+\.\d+$", latest_go_version):
+        print(f"Invalid Go version: {latest_go_version}")
+        return False
     
     with open("latest_go_version.txt", "w") as file:
         file.write(latest_go_version)
