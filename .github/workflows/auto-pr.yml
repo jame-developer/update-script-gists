@@ -1,0 +1,30 @@
+name: Auto PR
+
+on:
+  push:
+    branches-ignore:
+      - 'main' # replace with your default branch name
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.ACTION_TOKEN }}
+          commit-message: "Review changes from new branch"
+          title: "New changes from branch"
+          body: "This is an auto-generated PR with updates from the new branch."
+          branch: ${{ github.ref }}
+          author: jame-developer-bot[bot] <dev01[bot]@vedemaj.eu>
+          base: "main"
+          labels: |
+            report
+            automated pr
+          assignees: jame-developer
+          reviewers: jame-developer
