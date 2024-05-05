@@ -16,7 +16,7 @@ jobs:
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.ACTION_TOKEN }}
           commit-message: "Review changes from new branch"
           title: "New changes from branch"
           body: "This is an auto-generated PR with updates from the new branch."
